@@ -1,41 +1,45 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h> // Multithreading library
+#include<stdio.h>
+#include<stdlib.h>
+#include<pthread.h>
 
-#define NUM_OF_THREAD 3
-#define BUFF_SIZE 3
 
-pthread_t tid[NUM_OF_THREAD];
-void *arg;
-int identity[NUM_OF_THREAD];
-int buf[BUFF_SIZE];
+pthread_t td1, td2; // pthread variable
+pthread_cond_t prod_cv; // producer conditional variable
+pthread_cond_t cons_cv; // consumer conditional variable
 
 pthread_mutex_t mutex;
 
+void *producer(void * args){
 
-void *check_mutex(void *arg) {
-    pthread_mutex_trylock(&mutex);
-    int *val = (int*)arg;
-    int id = *val;
-    buf[id] = id;
-    printf("%s id = %d \n", "buf updated", id);
-    pthread_mutex_unlock(&mutex);
-    pthread_exit(0);
+
+}
+
+
+void *consumer(void * args){
+
+
 }
 
 int main() {
-    printf("%s\n", "Producer Consumer");
-    int i;
-    pthread_mutexattr_init(&mutex);
-    for(i=0; i< NUM_OF_THREAD; i++){
-        identity[i] = i;
-        pthread_create(&tid[i], NULL, check_mutex, &identity[i]);
-    }
+    // conditional variable initalization
+    pthread_cond_init(&prod_cv, NULL);
+    pthread_cond_init(&cons_cv, NULL);
 
-    for(i=0; i< NUM_OF_THREAD; i++){
-        pthread_join(tid[i], NULL);
-    }
+    // mutex initalization
+    pthread_mutex_init(&mutex, NULL);
+
+    // Thread 1 created
+    pthread_create(&td1, NULL, producer, 1);
+    // Thread 2 created
+    pthread_create(&td2, NULL, consumer, 1);
+
+    // Main thread wait for td1 td2 thread to finish
+    pthread_join(td1, NULL);
+    pthread_join(td2, NULL);
+
+    //Destroy mutex cache
     pthread_mutex_destroy(&mutex);
-
+    //Destroy conditional variable cache
+    pthread_cond_destroy(&cv);
     return 0;
 }
