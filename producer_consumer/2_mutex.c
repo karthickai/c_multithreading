@@ -10,7 +10,7 @@ void *arg;
 int identity[NUM_OF_THREAD];
 int buf[BUFF_SIZE];
 
-pthread_mutex_t mutex;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; /* mutex intializer */
 
 
 void *check_mutex(void *arg) {
@@ -24,9 +24,9 @@ void *check_mutex(void *arg) {
 }
 
 int main() {
-    printf("%s\n", "Producer Consumer");
+    printf("%s\n", "Mutex Basic Example");
     int i;
-    pthread_mutex_init(&mutex, NULL);
+
     for(i=0; i< NUM_OF_THREAD; i++){
         identity[i] = i;
         pthread_create(&tid[i], NULL, check_mutex, &identity[i]);

@@ -8,10 +8,41 @@
 #include <unistd.h>
 #endif
 
-pthread_t td1, td2; // Pthread variable
-pthread_cond_t cv; // Conditional variable
-pthread_mutex_t mutex;
+// Initialize
+pthread_cond_t cv= PTHREAD_COND_INITIALIZER; /* conditional variable */
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; /* mutex intializer */
+
+// Function Prototype
+void *emitter(void * args); /* emitter function intializer */
+void *receiver(void * args); /* receiver function intializer */
+
 int condition = 1;
+
+int main() {
+    pthread_t td1, td2; // Pthread variable
+
+    // receiver thread creation
+    if (pthread_create(&td1, NULL, receiver, NULL) !=0) {
+		fprintf(stderr, "Unable to create receiver thread");
+		exit(1);
+	}
+    
+    // emitter thread creation
+    if (pthread_create(&td2, NULL, emitter, NULL) !=0) {
+		fprintf(stderr, "Unable to create emitter thread");
+		exit(1);
+	}
+
+    // Main thread wait for td1 td2 thread to finish
+    pthread_join(td1, NULL);
+    pthread_join(td2, NULL);
+
+    //Destroy mutex cache
+    pthread_mutex_destroy(&mutex);
+    //Destroy conditional variable cache
+    pthread_cond_destroy(&cv);
+    return 0;
+}
 
 void *emitter(void * args){
     pthread_mutex_trylock(&mutex);
@@ -24,8 +55,8 @@ void *emitter(void * args){
     #endif
     condition = 0; // condtion changed
     printf("%s\n\n", "After 5 second condtion changed and emitted signal");
-    pthread_cond_signal(&cv);
     pthread_mutex_unlock(&mutex);
+    pthread_cond_signal(&cv); /* notify receiver to receive signal */
     pthread_exit(0);
 
 }
@@ -38,31 +69,6 @@ void *receiver(void * args){
         pthread_cond_wait(&cv, &mutex);
     }
     printf("%s\n", "Recieved signal");
-
     pthread_mutex_unlock(&mutex);
     pthread_exit(0);
-
-}
-
-int main() {
-    // conditional variable initalization
-    pthread_cond_init(&cv, NULL);
-
-    // mutex initalization
-    pthread_mutex_init(&mutex, NULL);
-
-    // Thread 1 created
-    pthread_create(&td1, NULL, receiver, NULL);
-    // Thread 2 created
-    pthread_create(&td2, NULL, emitter, NULL);
-
-    // Main thread wait for td1 td2 thread to finish
-    pthread_join(td1, NULL);
-    pthread_join(td2, NULL);
-
-    //Destroy mutex cache
-    pthread_mutex_destroy(&mutex);
-    //Destroy conditional variable cache
-    pthread_cond_destroy(&cv);
-    return 0;
 }

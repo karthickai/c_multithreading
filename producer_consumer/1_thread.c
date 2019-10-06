@@ -9,7 +9,7 @@ void *arg;
 int i;
 int identity[NUM_OF_THREAD];
 
-void greetings(void *arg) {
+void *greetings(void *arg) {
     int *val = (int*)arg;
     int id = *val;
     printf("%s id = %d \n", "Thread Started", id);
@@ -20,7 +20,10 @@ int main() {
     printf("%s\n", "Producer Consumer");
     for(i=0; i< NUM_OF_THREAD; i++){
         identity[i] = i;
-        pthread_create(&tid[i], NULL, greetings, &identity[i]);
+        if (pthread_create(&tid[i], NULL, greetings, &identity[i]) !=0) {
+		    fprintf(stderr, "Unable to create producer thread");
+		    exit(1);
+	    }
     }
 
     for(i=0; i< NUM_OF_THREAD; i++){
