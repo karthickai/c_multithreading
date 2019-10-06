@@ -52,9 +52,9 @@ int main() {
     pthread_mutex_init(&mutex, NULL);
 
     // Thread 1 created
-    pthread_create(&td1, NULL, receiver, 1);
+    pthread_create(&td1, NULL, receiver, NULL);
     // Thread 2 created
-    pthread_create(&td2, NULL, emitter, 1);
+    pthread_create(&td2, NULL, emitter, NULL);
 
     // Main thread wait for td1 td2 thread to finish
     pthread_join(td1, NULL);

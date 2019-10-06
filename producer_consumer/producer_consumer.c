@@ -29,9 +29,9 @@ int main() {
     pthread_mutex_init(&mutex, NULL);
 
     // Thread 1 created
-    pthread_create(&td1, NULL, producer, 1);
+    pthread_create(&td1, NULL, producer, NULL);
     // Thread 2 created
-    pthread_create(&td2, NULL, consumer, 1);
+    pthread_create(&td2, NULL, consumer, NULL);
 
     // Main thread wait for td1 td2 thread to finish
     pthread_join(td1, NULL);
@@ -40,6 +40,8 @@ int main() {
     //Destroy mutex cache
     pthread_mutex_destroy(&mutex);
     //Destroy conditional variable cache
-    pthread_cond_destroy(&cv);
+    pthread_cond_destroy(&prod_cv);
+    pthread_cond_destroy(&cons_cv);
+
     return 0;
 }
